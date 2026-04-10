@@ -12,7 +12,7 @@ import xml.etree.ElementTree                as ET
 from cryptography.hazmat.primitives         import serialization
 from datetime                               import datetime
 from requests_ntlm                          import HttpNtlmAuth
-from requests_kerberos          import HTTPKerberosAuth
+from requests_kerberos                      import HTTPKerberosAuth
 from requests_toolbelt.multipart            import decoder
 from utils.crypto                           import create_private_key, create_certificate, SCCM_sign, build_MS_public_key_blob
 from utils.request_templates                import *
