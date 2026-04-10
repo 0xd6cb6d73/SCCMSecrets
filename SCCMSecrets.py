@@ -50,7 +50,8 @@ def policies(
 
     if machine_name and kerberos:
         if not check_principal_format(machine_name):
-            logger.warning(f"{bcolors.WARNING}[!] Provided machine name isn't in a valid kerberos principal format{bcolors.ENDC}")
+            logger.error(f"{bcolors.FAIL}[!] Provided machine name isn't in a valid kerberos principal format{bcolors.ENDC}")
+            return
 
     # Arguments format and coherence checks
     if not management_point.startswith('http://') and not management_point.startswith('https://'):
@@ -177,7 +178,8 @@ def files(
 
     if username and kerberos:
         if not check_principal_format(username):
-            logger.warning(f"{bcolors.WARNING}[!] Provided user name isn't in a valid kerberos principal format{bcolors.ENDC}")
+            logger.error(f"{bcolors.FAIL}[!] Provided user name isn't in a valid kerberos principal format{bcolors.ENDC}")
+            return
 
     # Arguments format and coherence checks
     if not distribution_point.startswith('http://') and not distribution_point.startswith('https://'):
