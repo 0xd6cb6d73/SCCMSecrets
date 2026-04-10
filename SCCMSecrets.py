@@ -38,9 +38,10 @@ def policies(
     registration_sleep: Annotated[int, typer.Option("--registration-sleep", "-rs", help="[Optional] The amount of time, in seconds, that should be waited after registrating a new device. A few minutes is recommended so that the new device can be added to device collections (3 minutes by default, may need to be increased)")] = 180,
     use_existing_device: Annotated[str, typer.Option("--use-existing-device", "-d", help="[Optional] This option can be used to re-run SCCMSecrets.py using a previously registered device ; or to impersonate a legitimate SCCM client. In both cases, it expects the path of a folder containing a guid.txt file (the SCCM device GUID) and the key.pem file (the client's private key). Note that a client-name value must also be provided to SCCMSecrets (but does not have to match the one of the existing device)")] = None,
     pki_cert: Annotated[str, typer.Option("--pki-cert", "-c", help="[Optional] The path to a valid domain PKI certificate in PEM format. Required when the Management Point enforces HTTPS and thus client certificate authentication")] = None,
-    pki_key: Annotated[str, typer.Option("--pki-key", "-k", help="[Optional] The path to the private key of the certificate in PEM format")] = None,
+    pki_key: Annotated[str, typer.Option("--pki-key", "-pk", help="[Optional] The path to the private key of the certificate in PEM format")] = None,
     altauth: Annotated[bool, typer.Option("--altauth", "-a", help="[Optional] Use the MP's alternate authentication endpoint. This endpoint bypasses mutual TLS requirements, and automatically approves devices registered through it. It only works when the MP uses HTTPS AND HTTPS is enforced site-wide")] = False,
-    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="[Optional] Enable verbose output")] = False
+    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="[Optional] Enable verbose output")] = False,
+    kerberos: Annotated[bool, typer.Option("--kerberos", "-k", help="[Optional] Enable kerberos authentication. Uses GSSAPI or KRB5CCNAME.")] = False
 ):
     print_banner()
     if verbose is False: logging.basicConfig(format='%(message)s', level=logging.WARN)
@@ -102,7 +103,8 @@ def policies(
         machine_pass,
         pki_cert,
         pki_key,
-        altauth
+        altauth,
+        kerberos
     )
 
     if use_existing_device is None:
@@ -159,9 +161,10 @@ def files(
     urls: Annotated[str, typer.Option("--urls", "-f", help="[Optional] A file containing a list of URLs (one per line) that should be downloaded from the Distribution Point. This is useful if you already indexed files and do not want to download by extension, but rather specific known files")] = None,
     max_recursion: Annotated[int, typer.Option("--max-recursion", "-r", help="[Optional] The maximum recursion depth when indexing files from the Distribution Point")] = 10,
     pki_cert: Annotated[str, typer.Option("--pki-cert", "-c", help="[Optional] The path to a valid domain PKI certificate in PEM format. Required when the Distribution Point enforces HTTPS and thus client certificate authentication")] = None,
-    pki_key: Annotated[str, typer.Option("--pki-key", "-k", help="[Optional] The path to the private key of the certificate in PEM format")] = None,
+    pki_key: Annotated[str, typer.Option("--pki-key", "-pk", help="[Optional] The path to the private key of the certificate in PEM format")] = None,
     nocert: Annotated[bool, typer.Option("--nocert", "-n", help="[Optional] Use the DP's nocert endpoint. This endpoint bypasses mutual TLS requirements")] = False,
-    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="[Optional] Enable verbose output")] = False
+    verbose: Annotated[bool, typer.Option("--verbose", "-v", help="[Optional] Enable verbose output")] = False,
+    kerberos: Annotated[bool, typer.Option("--kerberos", "-k", help="[Optional] Enable kerberos authentication. Uses GSSAPI or KRB5CCNAME.")] = False
 ):
     print_banner()
     if verbose is False: logging.basicConfig(format='%(message)s', level=logging.WARN)
@@ -232,7 +235,8 @@ def files(
         password ,
         pki_cert,
         pki_key,
-        nocert
+        nocert,
+        kerberos
     )
 
     try:
