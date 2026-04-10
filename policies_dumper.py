@@ -78,7 +78,10 @@ class PoliciesDumper():
         self.session = requests.Session()
         self.session.headers.update(MP_INTERACTIONS_HEADERS)
         if kerberos:
-            self.session.auth = HTTPKerberosAuth(force_preemptive=True)
+            if machine_name:
+                principal, realm = machine_name.split('@')
+                machine_name = principal + '@' + realm.upper()
+            self.session.auth = HTTPKerberosAuth(force_preemptive=True, principal=machine_name)
         elif machine_name is not None and machine_pass is not None and use_existing_device is None:
             self.session.auth = HttpNtlmAuth(machine_name, machine_pass)
         if self.use_https:

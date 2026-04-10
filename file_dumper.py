@@ -46,7 +46,10 @@ class FileDumper():
         self.session = requests.Session()
         self.session.headers.update(DP_DOWNLOAD_HEADERS)
         if kerberos:
-            self.session.auth = HTTPKerberosAuth(force_preemptive=True)
+            if username:
+                principal, realm = username.split('@')
+                username = principal + '@' + realm.upper()
+            self.session.auth = HTTPKerberosAuth(force_preemptive=True, principal=username)
         elif username is not None and password is not None and not kerberos:
             self.session.auth = HttpNtlmAuth(username, password)
         if self.use_https:

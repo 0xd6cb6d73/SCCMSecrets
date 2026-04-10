@@ -9,6 +9,7 @@ from typing_extensions                  import Annotated
 from file_dumper                        import FileDumper
 from policies_dumper                    import PoliciesDumper
 from conf                               import bcolors, ANONYMOUSDP, SCCMDPFileDumpError, SCCMPoliciesDumpError
+from utils.principal_format             import check_principal_format
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +48,17 @@ def policies(
     if verbose is False: logging.basicConfig(format='%(message)s', level=logging.WARN)
     else: logging.basicConfig(format='%(message)s', level=logging.INFO)
 
+    if machine_name and kerberos:
+        if not check_principal_format(machine_name):
+            logger.warning(f"{bcolors.WARNING}[!] Provided machine name isn't in a valid kerberos principal format{bcolors.ENDC}")
+
     # Arguments format and coherence checks
     if not management_point.startswith('http://') and not management_point.startswith('https://'):
         management_point = f'http://{management_point}'
     if management_point.endswith('/'):
         management_point = management_point[:-1]
     if machine_name is not None and (machine_pass is None and machine_hash is None) \
-        or (machine_pass is not None or machine_hash is not None) and machine_name is None:
+        or (machine_pass is not None or machine_hash is not None) and machine_name is None and not kerberos:
         logger.error(f"{bcolors.FAIL}[!] When providing a machine name, please also provide either the cleartext password or the NT hash{bcolors.ENDC}")
         return
     if machine_hash is not None and len(machine_hash) != 32:
@@ -170,12 +175,16 @@ def files(
     if verbose is False: logging.basicConfig(format='%(message)s', level=logging.WARN)
     else: logging.basicConfig(format='%(message)s', level=logging.INFO)
 
+    if username and kerberos:
+        if not check_principal_format(username):
+            logger.warning(f"{bcolors.WARNING}[!] Provided user name isn't in a valid kerberos principal format{bcolors.ENDC}")
+
     # Arguments format and coherence checks
     if not distribution_point.startswith('http://') and not distribution_point.startswith('https://'):
         distribution_point = f'http://{distribution_point}'
     if distribution_point.endswith('/'):
         distribution_point = distribution_point[:-1]
-    if username is not None and (password is None and hash is None):
+    if username is not None and (password is None and hash is None) and not kerberos:
         logger.error(f"{bcolors.FAIL}[!] When providing a username, please also provide either the cleartext password or the NT hash{bcolors.ENDC}")
         return
     if hash is not None and len(hash) != 32:
